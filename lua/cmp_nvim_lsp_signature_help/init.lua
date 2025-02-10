@@ -32,13 +32,7 @@ end
 
 source.complete = function(self, params, callback)
   local client = self:_get_client()
-  local trigger_characters = {}
-  for _, c in ipairs(self:_get(client.server_capabilities, { 'signatureHelpProvider', 'triggerCharacters' }) or {}) do
-    table.insert(trigger_characters, c)
-  end
-  for _, c in ipairs(self:_get(client.server_capabilities, { 'signatureHelpProvider', 'retriggerCharacters' }) or {}) do
-    table.insert(trigger_characters, c)
-  end
+  local trigger_characters = self:get_trigger_characters()
 
   local trigger_character = nil
   for _, c in ipairs(trigger_characters) do
@@ -192,8 +186,7 @@ source._parameter_label = function(_, signature, parameter)
 end
 
 source._get_client = function(self)
-  local get_clients = vim.lsp.get_clients or vim.lsp.buf_get_clients
-  for _, client in pairs(get_clients()) do
+  for _, client in pairs(vim.lsp.get_clients({bufnr = 0})) do
     if self:_get(client.server_capabilities, { 'signatureHelpProvider' }) then
       return client
     end
